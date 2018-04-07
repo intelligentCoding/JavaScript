@@ -8,17 +8,98 @@ GAME RULES:
 - The first player to reach 100 points on GLOBAL score wins the game
 
 */
-var scores, roundScores, activePlayer, dice;
-scores = [0,0];
-roundScore = 0;
-activePlayer = 0;
+var scores, roundScores, activePlayer, gamePlaying;
+init();
+var lastDice;
 
-// For dice we need to call a random number. We will use the Math Object that is built In javascript.
-dice = Math.floor(Math.random() * 6) + 1;
-//Checking if dice works
-//console.log(dice);
-document.querySelector('#score-' + activePlayer).textContent = dice;
 
-document.querySelector('.dice').style.display = 'none';
 
-document.querySelector('.btn-roll').addEventListener('click')
+
+
+document.querySelector('.btn-roll').addEventListener('click', function () {
+    if (gamePlaying) {
+            //What happens when someone click on the buton.
+    // 1. First We need a random Number.
+    // For dice we need to call a random number. We will use the Math Object that is built In javascript.
+    var dice = Math.floor(Math.random() * 6) + 1;
+    //2. Display the Result
+    var diceDOM = document.querySelector('.dice');
+    diceDOM.style.display = 'block';
+    //Now we have to show the image according to the value of dice.
+    diceDOM.src = 'dice-' + dice + '.png';
+    //3. Update the round score but only IF the rooled number was NOT a 1. 
+    if (dice !== 1) {
+        roundScores += dice;
+        document.querySelector('#current-' + activePlayer).textContent = roundScores;
+        
+    } else {
+        
+    //If dice value is 1, we want next player.
+        nextPlayer();
+    }
+        
+    }
+    lastDice = dice;
+});
+document.querySelector('.btn-hold').addEventListener('click', function () {
+   
+    if(gamePlaying){
+            
+    //First we will add current scores to Global score.
+    scores[activePlayer] += roundScores;
+    document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
+    if (scores[activePlayer] >= 20 ){
+        document.querySelector('#name-' + activePlayer).textContent = 'Winner!';
+        document.querySelector('.dice').style.display = 'none';
+        document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
+        document.querySelector('.player-' + activePlayer + '-panel').classList.remove('winner');
+        gamePlaying = false;
+    } else {
+       nextPlayer(); 
+    }
+    }
+    
+    
+});
+document.querySelector('.btn-new').addEventListener('click', init);
+
+function nextPlayer () {
+    if (activePlayer === 0) {
+            activePlayer = 1;
+        } else {
+            activePlayer = 0;
+        }
+        roundScores = 0;
+        document.getElementById('current-0').textContent = '0';
+        document.getElementById('current-1').textContent = '0';
+        
+        //we have to change the colour of active players.
+        //document.querySelector('.player-0-panel').classList.remove('active');
+       //document.querySelector('.player-1-panel').classList.add('active');
+        //we will do it the better way.
+        document.querySelector('.player-0-panel').classList.toggle('active');
+        document.querySelector('.player-1-panel').classList.toggle('active');
+        //When the player one loses it's turn we want dice to be hidden.
+        
+        document.querySelector('.dice').style.display = 'none';
+}
+function init() {
+    scores = [0,0];
+    roundScores = 0;
+    activePlayer = 0;
+    gamePlaying = true;
+    document.querySelector('.dice').style.display = 'none';
+
+    document.getElementById('score-0').textContent = '0';
+    document.getElementById('score-1').textContent = '0';
+    document.getElementById('current-0').textContent = '0';
+    document.getElementById('current-1').textContent = '0';
+    document.getElementById('name-0').textContent = 'Player 1!';
+    document.getElementById('name-1').textContent = 'Player 2!';
+    document.querySelector('.player-0-panel').classList.remove('winner');
+    document.querySelector('.player-1-panel').classList.remove('winner');
+    document.querySelector('.player-0-panel').classList.remove('active');
+    document.querySelector('.player-1-panel').classList.remove('active');
+    document.querySelector('.player-0-panel').classList.add('active');
+
+}
